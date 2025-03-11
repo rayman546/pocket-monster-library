@@ -10,6 +10,7 @@ interface PokemonCardProps {
 const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
   const [isRotated, setIsRotated] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showShiny, setShowShiny] = useState(false);
   
   const typeColors: Record<string, string> = {
     normal: 'bg-pokemon-normal',
@@ -51,6 +52,15 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
   const handleImageLoad = () => {
     setIsLoaded(true);
   };
+
+  const toggleShiny = () => {
+    setShowShiny(!showShiny);
+  };
+
+  // Choose the appropriate sprite based on showShiny state
+  const spriteUrl = showShiny 
+    ? pokemon.sprites.other['official-artwork'].front_shiny || pokemon.sprites.front_shiny
+    : pokemon.sprites.other['official-artwork'].front_default;
   
   return (
     <div 
@@ -68,11 +78,18 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
               </div>
             )}
             <img 
-              src={pokemon.sprites.other['official-artwork'].front_default} 
-              alt={pokemon.name} 
-              className={`w-40 h-40 object-contain transition-opacity duration-300 select-none animate-float ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+              src={spriteUrl} 
+              alt={`${pokemon.name}${showShiny ? ' (Shiny)' : ''}`}
+              onClick={toggleShiny}
+              className={`w-40 h-40 object-contain transition-opacity duration-300 select-none animate-float ${isLoaded ? 'opacity-100' : 'opacity-0'} cursor-pointer`}
               onLoad={handleImageLoad}
+              title={showShiny ? "Click to see normal form" : "Click to see shiny form"}
             />
+            {showShiny && (
+              <div className="mt-1 px-2 py-0.5 bg-amber-500/20 text-amber-600 text-xs font-semibold rounded-full">
+                ✨ Shiny ✨
+              </div>
+            )}
             <div className="mt-4 text-center w-full">
               <span className="inline-block text-xs font-medium text-muted-foreground/80 bg-muted/80 rounded-full px-2 py-0.5 mb-1">
                 #{pokemon.id.toString().padStart(3, '0')}
@@ -127,3 +144,4 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
 };
 
 export default PokemonCard;
+
